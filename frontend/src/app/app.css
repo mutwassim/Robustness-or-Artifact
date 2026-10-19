@@ -1,0 +1,24 @@
+* { box-sizing: border-box; }
+.shell { max-width: 760px; margin: 40px auto; padding: 24px;
+  font-family: Arial, sans-serif; color: #19304a; }
+header { border-bottom: 3px solid #2a6a9c; margin-bottom: 24px; }
+header p { color: #5a6b7b; }
+form { display: grid; gap: 16px; }
+label { display: grid; gap: 8px; font-weight: 600; }
+input { padding: 12px; font-size: 15px; border: 1px solid #a8b9c7; border-radius: 6px; }
+.examples { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: #5a6b7b; }
+.chip { background: #edf2f7; color: #19304a; border: 1px solid #c8d4df;
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+button[type='submit'] { justify-self: start; background: #17659a; color: white; border: 0;
+  border-radius: 7px; padding: 12px 20px; cursor: pointer; font-size: 15px; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.notice { background: #fff4d6; padding: 14px; border-radius: 6px; margin-bottom: 16px; }
+.error { color: #a01728; font-weight: bold; }
+.result { margin-top: 24px; background: #e9f7ef; border-left: 6px solid #2e8b57;
+  padding: 18px; border-radius: 8px; }
+.result.phishing { background: #fdecee; border-left-color: #c0392b; }
+.verdict { font-size: 28px; font-weight: bold; margin: 4px 0 12px; }
+.bar { height: 10px; background: #dde5ec; border-radius: 5px; overflow: hidden; }
+.fill { height: 100%; background: #c0392b; }
+.small { font-size: 13px; color: #5a6b7b; }
+.disclaimer { font-size: 13px; color: #5a6b7b; font-style: italic; }

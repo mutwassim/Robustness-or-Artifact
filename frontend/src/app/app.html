@@ -1,0 +1,57 @@
+<main class="shell">
+  <header>
+    <h1>Phishing URL Checker</h1>
+    <p>Robustness or Artifact? · PhiUSIIL research prototype · Character TF-IDF + Logistic Regression</p>
+  </header>
+
+  @if (deployedStatic) {
+    <aside class="notice">
+      Static GitHub Pages demonstration only. Predictions require Flask and Angular running locally.
+    </aside>
+  }
+
+  <form (ngSubmit)="submit()">
+    <h2>Model input features ({{ fields.length }})</h2>
+
+    @for (field of fields; track field.name) {
+      <label [for]="field.name">
+        {{ field.label }}
+        <input
+          [id]="field.name"
+          [name]="field.name"
+          type="text"
+          autocomplete="off"
+          [placeholder]="field.placeholder ?? ''"
+          [attr.maxlength]="field.maxLength ?? null"
+          [required]="field.required"
+          [(ngModel)]="values[field.name]" />
+      </label>
+    }
+
+    <div class="examples">
+      <span>Try:</span>
+      @for (ex of examples; track ex.url) {
+        <button type="button" class="chip" (click)="useExample(ex.url)">{{ ex.label }}</button>
+      }
+    </div>
+
+    <button type="submit" [disabled]="loading() || deployedStatic">
+      {{ loading() ? 'Checking…' : 'Run local prediction' }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (result(); as r) {
+    <section class="result" [class.phishing]="r.is_phishing">
+      <h2>Prediction result</h2>
+      <p class="verdict">{{ r.prediction }}</p>
+      <p>Phishing probability: {{ (r.phishing_probability * 100).toFixed(2) }}%</p>
+      <div class="bar"><div class="fill" [style.width.%]="r.phishing_probability * 100"></div></div>
+      <p class="small">Probabilities [Legitimate, Phishing]: {{ r.probabilities.join(', ') }}</p>
+      <p class="disclaimer">{{ r.disclaimer }}</p>
+    </section>
+  }
+</main>
