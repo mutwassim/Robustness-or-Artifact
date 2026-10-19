@@ -1,56 +1,155 @@
 <main class="shell">
-  <header>
-    <h1>Phishing URL Checker</h1>
-    <p>Robustness or Artifact? · PhiUSIIL research prototype · Character TF-IDF + Logistic Regression</p>
+  <header class="masthead">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l7.5 3v5.5c0 4.6-3.1 8.2-7.5 9.5-4.4-1.3-7.5-4.9-7.5-9.5V6L12 3z" />
+        <path d="M9 12l2.2 2.2L15.5 10" />
+      </svg>
+    </span>
+    <div class="masthead-text">
+      <h1>Phishing URL Checker</h1>
+      <ul class="tags">
+        <li>Robustness or Artifact?</li>
+        <li>PhiUSIIL research prototype</li>
+        <li>Character TF-IDF + Logistic Regression</li>
+      </ul>
+    </div>
   </header>
 
   @if (deployedStatic) {
-    <aside class="notice">
-      Static GitHub Pages demonstration only. Predictions require Flask and Angular running locally.
+    <aside class="notice" role="note">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v5M12 16.5v.01" />
+      </svg>
+      <p>Static GitHub Pages demonstration only. Predictions require Flask and Angular running locally.</p>
     </aside>
   }
 
-  <form (ngSubmit)="submit()">
-    <h2>Model input features ({{ fields.length }})</h2>
+  <form class="panel" (ngSubmit)="submit()" [attr.aria-busy]="loading()">
+    <div class="panel-head">
+      <h2>Model input features</h2>
+      <span class="count">{{ fields.length }} {{ fields.length === 1 ? 'feature' : 'features' }}</span>
+    </div>
 
-    @for (field of fields; track field.name) {
-      <label [for]="field.name">
-        {{ field.label }}
-        <input
-          [id]="field.name"
-          [name]="field.name"
-          type="text"
-          autocomplete="off"
-          [placeholder]="field.placeholder ?? ''"
-          [attr.maxlength]="field.maxLength ?? null"
-          [required]="field.required"
-          [(ngModel)]="values[field.name]" />
-      </label>
-    }
-
-    <div class="examples">
-      <span>Try:</span>
-      @for (ex of examples; track ex.url) {
-        <button type="button" class="chip" (click)="useExample(ex.url)">{{ ex.label }}</button>
+    <div class="fields">
+      @for (field of fields; track field.name) {
+        <label class="field" [for]="field.name">
+          <span class="field-label">
+            {{ field.label }}
+            @if (field.required) {
+              <abbr class="req" title="Required">*</abbr>
+            }
+          </span>
+          <input
+            [id]="field.name"
+            [name]="field.name"
+            type="text"
+            autocomplete="off"
+            [placeholder]="field.placeholder ?? ''"
+            [attr.maxlength]="field.maxLength ?? null"
+            [required]="field.required"
+            [(ngModel)]="values[field.name]" />
+        </label>
       }
     </div>
 
-    <button type="submit" [disabled]="loading() || deployedStatic">
-      {{ loading() ? 'Checking…' : 'Run local prediction' }}
-    </button>
+    @if (examples.length) {
+      <div class="examples">
+        <span class="examples-label">Try an example:</span>
+        <div class="chips">
+          @for (ex of examples; track ex.url) {
+            <button type="button" class="chip" (click)="useExample(ex.url)">{{ ex.label }}</button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="actions">
+      <button type="submit" class="primary" [disabled]="loading() || deployedStatic">
+        @if (loading()) {
+          <span class="spinner" aria-hidden="true"></span>
+        }
+        {{ loading() ? 'Checking…' : 'Run local prediction' }}
+      </button>
+      @if (deployedStatic) {
+        <span class="hint">Disabled on the static demo</span>
+      }
+    </div>
   </form>
 
   @if (error()) {
-    <p class="error" role="alert">{{ error() }}</p>
+    <div class="error" role="alert">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7.5v5.5M12 16.5v.01" />
+      </svg>
+      <p>{{ error() }}</p>
+    </div>
   }
 
   @if (result(); as r) {
-    <section class="result" [class.phishing]="r.is_phishing">
-      <h2>Prediction result</h2>
-      <p class="verdict">{{ r.prediction }}</p>
-      <p>Phishing probability: {{ (r.phishing_probability * 100).toFixed(2) }}%</p>
-      <div class="bar"><div class="fill" [style.width.%]="r.phishing_probability * 100"></div></div>
-      <p class="small">Probabilities [Legitimate, Phishing]: {{ r.probabilities.join(', ') }}</p>
+    <section class="result" [class.phishing]="r.is_phishing" aria-live="polite">
+      <div class="result-top">
+        <div class="result-id">
+          <span class="result-icon" aria-hidden="true">
+            @if (r.is_phishing) {
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3.5l9.5 16.5h-19L12 3.5z" />
+                <path d="M12 10v4.5M12 17.5v.01" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l7.5 3v5.5c0 4.6-3.1 8.2-7.5 9.5-4.4-1.3-7.5-4.9-7.5-9.5V6L12 3z" />
+                <path d="M9 12l2.2 2.2L15.5 10" />
+              </svg>
+            }
+          </span>
+          <div>
+            <h2>Prediction result</h2>
+            <p class="verdict">{{ r.prediction }}</p>
+          </div>
+        </div>
+
+        <div class="result-pct">
+          <span class="pct-value">{{ (r.phishing_probability * 100).toFixed(2) }}%</span>
+          <span class="pct-label">Phishing probability</span>
+        </div>
+      </div>
+
+      <div class="gauge">
+        <div
+          class="bar"
+          role="meter"
+          aria-label="Phishing probability"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="(r.phishing_probability * 100).toFixed(2)">
+          <div class="fill" [style.width.%]="r.phishing_probability * 100"></div>
+        </div>
+        <div class="scale" aria-hidden="true">
+          <span>0%</span>
+          <span>50% threshold</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <dl class="split">
+        <div class="split-item">
+          <dt>Legitimate</dt>
+          <dd>{{ ((1 - r.phishing_probability) * 100).toFixed(2) }}%</dd>
+        </div>
+        <div class="split-item">
+          <dt>Phishing</dt>
+          <dd>{{ (r.phishing_probability * 100).toFixed(2) }}%</dd>
+        </div>
+      </dl>
+
+      <details class="raw">
+        <summary>Raw model output</summary>
+        <p class="small">Probabilities [Legitimate, Phishing]: {{ r.probabilities.join(', ') }}</p>
+      </details>
+
       <p class="disclaimer">{{ r.disclaimer }}</p>
     </section>
   }
